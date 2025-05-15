@@ -3,6 +3,7 @@ import sql from './bd.js'
 import { compararHash, Criarhash } from './utils.js';
 
 
+
 const routes = express.Router()
 
 //busca de usuarios 
@@ -55,7 +56,13 @@ routes.post('/usuario', async (req, res) => {
         return res.status(201).json({ mensagem: "Usuário criado com sucesso" });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ mensagem: "Erro inesperado no servidor" });
+        if(error.code === '23502' || error.code === '23505'){
+            return res.status(409).json('Violation rule')
+        }
+        else{
+            return res.status(500).json('Erro inesperado')
+
+        }
     }
 })
 
@@ -91,7 +98,13 @@ routes.post('/Cperguntas', async (req, res)=>{
     return res.status(201).json('ok')
     }
     catch(error){
-        return res.status(500).json('erro ao cadastrar pergunta')
+        if(error.code === '23502' || error.code === '23505'){
+            return res.status(409).json('Violação de regra do bd')
+        }
+        else{
+            return res.status(500).json('Erro inesperado')
+
+        }
     }
 })
 
@@ -143,7 +156,7 @@ routes.put('/editar', async (req, res)=>{
     catch(error){
         console.log(error)
         
-        if(error === 409){
+        if(error.code === '23502' || error.code === '23505'){
             return res.status(409).json('Violação de regra do bd')
         }
         else{
@@ -152,6 +165,14 @@ routes.put('/editar', async (req, res)=>{
         }
     }
 })
+
+
+
+
+
+
+
+
 
 
 export default routes
