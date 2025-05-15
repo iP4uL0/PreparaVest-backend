@@ -38,8 +38,7 @@ routes.post('/login',async (req, res)=>{
 //*cadastro de alunos
 routes.post('/usuario', async (req, res) => {
     try {
-        const funcao = "aluno"
-        const status = "1"
+    
         const { email, senha } = req.body;
 
         // Verifica se o email já existe
@@ -52,7 +51,7 @@ routes.post('/usuario', async (req, res) => {
 
         await sql`
             INSERT INTO usuarios(email, senha, funcao, status)
-            VALUES (${email}, ${hash}, ${funcao}, ${status} )
+            VALUES (${email}, ${hash}, 'aluno', '1' )
         `;
 
         return res.status(201).json({ mensagem: "Usuário criado com sucesso" });
@@ -74,14 +73,12 @@ routes.post('/Admin', async (req, res)=>{
     
     
     try {
-        const funcao = "professor"
-        const status = "1"
         const {email, senha} = req.body;
 
         const hash = await Criarhash(senha, 10)
         
         await sql`insert into usuarios(email, senha, funcao, status)
-        values(${email}, ${hash}, ${funcao}, ${status})`
+        values(${email}, ${hash}, 'professor', '1')`
 
         return res.status(201).json('ok')
 
@@ -97,7 +94,6 @@ routes.post('/Admin', async (req, res)=>{
 //*cadastro perguntas
 routes.post('/Cperguntas', async (req, res)=>{
     try{
-        const status = "1"
         const {enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta} = req.body;
     await sql`insert into perguntas (enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta, status) values (
     ${enunciado}, 
@@ -106,7 +102,7 @@ routes.post('/Cperguntas', async (req, res)=>{
     ${alternativa_c}, 
     ${alternativa_d}, 
     ${correta}, 
-    ${status});`
+    '1');`
     return res.status(201).json('ok')
     }
     catch(error){
