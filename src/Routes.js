@@ -6,13 +6,13 @@ import { compararHash, Criarhash } from './utils.js';
 
 const routes = express.Router()
 
-//busca de usuarios 
+//*busca de usuarios 
 routes.post('/login',async (req, res)=>{
-    const { usuario, senha } = req.body
+    const { email, senha } = req.body
     try{
         
-        const consulta = await sql`select id, senha, status from usuarios
-        where usuario = ${usuario}`
+        const consulta = await sql`select id_usuario, senha, funcao, status from usuarios
+        where email = ${email}`
 
         if(consulta.length == 0){
             return res.status(409).json('usuario não cadastrado')
@@ -35,9 +35,11 @@ routes.post('/login',async (req, res)=>{
 
 
 
-//cadastro de alunos
+//*cadastro de alunos
 routes.post('/usuario', async (req, res) => {
     try {
+        const funcao = "aluno"
+        const status = "1"
         const { email, senha } = req.body;
 
         // Verifica se o email já existe
@@ -49,8 +51,8 @@ routes.post('/usuario', async (req, res) => {
         const hash = await Criarhash(senha, 10);
 
         await sql`
-            INSERT INTO usuarios(email, senha)
-            VALUES (${email}, ${hash})
+            INSERT INTO usuarios(email, senha, funcao, status)
+            VALUES (${email}, ${hash}, ${funcao}, ${status} )
         `;
 
         return res.status(201).json({ mensagem: "Usuário criado com sucesso" });
@@ -67,17 +69,19 @@ routes.post('/usuario', async (req, res) => {
 })
 
 
-//cadastro de Adiministradores
+//*cadastro de Adiministradores
 routes.post('/Admin', async (req, res)=>{
     
     
     try {
-        const {usuarioA, senha} = req.body;
+        const funcao = "professor"
+        const status = "1"
+        const {email, senha} = req.body;
 
         const hash = await Criarhash(senha, 10)
         
-        await sql`insert into usuarios(usuario, senha, status)
-        values(${usuarioA},${hash},'adimim')`
+        await sql`insert into usuarios(email, senha, funcao, status)
+        values(${email}, ${hash}, ${funcao}, ${status})`
 
         return res.status(201).json('ok')
 
@@ -90,14 +94,23 @@ routes.post('/Admin', async (req, res)=>{
 })
 
 
-//cadastro perguntas
+//*cadastro perguntas
 routes.post('/Cperguntas', async (req, res)=>{
     try{
-        const {pergunta, a, b, c, d, resposta, dificuldade, correct_answer } = req.body;
-    await sql`insert into perguntas (pergunta, a, b, c, d, resposta, dificuldade, correct_answer) values (${pergunta}, ${a}, ${b}, ${c}, ${d}, ${resposta}, ${dificuldade}, ${correct_answer});`
+        const status = "1"
+        const {enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta} = req.body;
+    await sql`insert into perguntas (enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta, status) values (
+    ${enunciado}, 
+    ${alternativa_a}, 
+    ${alternativa_b}, 
+    ${alternativa_c}, 
+    ${alternativa_d}, 
+    ${correta}, 
+    ${status});`
     return res.status(201).json('ok')
     }
     catch(error){
+        console.log(error)
         if(error.code === '23502' || error.code === '23505'){
             return res.status(409).json('Violação de regra do bd')
         }
@@ -109,7 +122,7 @@ routes.post('/Cperguntas', async (req, res)=>{
 })
 
 
-//Busca perguntas
+//*Busca perguntas
 routes.post('/Bperguntas',async (req, res)=>{
 
     try{
@@ -124,12 +137,13 @@ routes.post('/Bperguntas',async (req, res)=>{
 });
 
 
-//Deletar pergunta
-routes.delete('/Delete/:pergunta', async (req, res)=>{
+//*Deletar pergunta
+routes.delete('/Delete/:id_pergunta', async (req, res)=>{
 
     try{
-        const {id} = req.params
-        await sql`DELETE FROM perguntas WHERE id = ${id};`
+        const {id_pergunta} = req.params
+      
+        await sql`DELETE FROM perguntas WHERE id_pergunta = ${id_pergunta};`
         return res.status(204).json('Pergunta deletada')
     }
     catch(error){
@@ -138,18 +152,18 @@ routes.delete('/Delete/:pergunta', async (req, res)=>{
     }
 })
 
-//Editar perguntas
+//*Editar perguntas
 routes.put('/editar', async (req, res)=>{
     try{
-        const {id, updpergunta, a, b, c, d, dificuldade, resposta} = req.body
-        await sql`update perguntas set pergunta = ${updpergunta}, 
-        a = ${a}, 
-        b = ${b}, 
-        c = ${c}, 
-        d = ${d}, 
-        dificuldade = ${dificuldade}, 
-        resposta = ${resposta}
-        where id = ${id};`
+        const {id_pergunta, newEnunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta} = req.body
+        
+        await sql`update perguntas set enunciado = ${newEnunciado}, 
+        alternativa_a = ${alternativa_a}, 
+        alternativa_b = ${alternativa_b}, 
+        alternativa_c = ${alternativa_c}, 
+        alternativa_d = ${alternativa_d},  
+        correta = ${correta}
+        where id_pergunta = ${id_pergunta};`
   
         return res.status(204).json('Ação efetuada')
     }
