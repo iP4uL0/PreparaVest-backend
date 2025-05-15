@@ -15,7 +15,7 @@ routes.post('/login',async (req, res)=>{
         where email = ${email}`
 
         if(consulta.length == 0){
-            return res.status(409).json('usuario não cadastrado')
+            return res.status(401).json('usuario não cadastrado')
         }
 
         const teste = await compararHash(senha, consulta[0].senha)
@@ -28,7 +28,6 @@ routes.post('/login',async (req, res)=>{
         }
     }
     catch(error){
-        console.log(error)
         return res.status(500).json('um erro inesperado ocorreu')
     }
 })
@@ -39,16 +38,6 @@ routes.post('/login',async (req, res)=>{
 routes.post('/usuario', async (req, res) => {
     try {
     
-        const { email, senha } = req.body;
-
-        // Verifica se o email já existe
-        const existingUser = await sql`SELECT * FROM usuarios WHERE email = ${email}`;
-        if (existingUser.length > 0) {
-            return res.status(409).json({ mensagem: "Email já cadastrado" });
-        }
-
-        const hash = await Criarhash(senha, 10);
-
         await sql`
             INSERT INTO usuarios(email, senha, funcao, status)
             VALUES (${email}, ${hash}, 'aluno', '1' )
