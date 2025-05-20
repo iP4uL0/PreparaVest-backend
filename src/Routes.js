@@ -9,7 +9,7 @@ routes.post('/login',async (req, res)=>{
     const { email, senha } = req.body
     try{
         const consulta = await sql`select id_usuario, senha, funcao, status from usuarios
-        where email = ${email} AND status = 1`
+        where email = ${email} AND status = '1'`
 
         if(consulta.length == 0){
             return res.status(401).json('usuario não cadastrado')
@@ -125,7 +125,7 @@ routes.post('/perguntas', async (req, res)=>{
 //*Busca perguntas
 routes.get('/perguntas',async (req, res)=>{
     try{
-        const consulta = await sql`SELECT * FROM perguntas WHERE status = 1 ORDER BY RANDOM() LIMIT 10`
+        const consulta = await sql`SELECT * FROM perguntas WHERE status = '1' ORDER BY RANDOM() LIMIT 10`
         return res.status(201).json(consulta)
     }
     catch(error){
