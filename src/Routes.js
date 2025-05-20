@@ -8,7 +8,7 @@ const routes = express.Router()
 routes.post('/login',async (req, res)=>{
     const { email, senha } = req.body
     try{
-        const consulta = await sql`select id_usuario, funcao from usuarios
+        const consulta = await sql`select id_usuario,senha, funcao from usuarios
         where email = ${email} AND status = '1'`
 
         if(consulta.length == 0){
@@ -18,7 +18,7 @@ routes.post('/login',async (req, res)=>{
         const teste = await compararHash(senha, consulta[0].senha)
 
         if(teste){
-            return res.status(200).json(consulta)
+            return res.status(200).json(consulta[0].funcao)
             
         }
         else{
