@@ -135,7 +135,8 @@ routes.get('/perguntas',async (req, res)=>{
 
 
 //*Deletar pergunta
-routes.delete('/Delete/:id_pergunta', async (req, res)=>{
+// const {id_pergunta} = req.params
+routes.delete('/perguntas/:id_pergunta', async (req, res)=>{
     try{
         const {id_pergunta} = req.params
       
@@ -149,7 +150,7 @@ routes.delete('/Delete/:id_pergunta', async (req, res)=>{
 
 
 //*Editar perguntas
-routes.put('/editar', async (req, res)=>{
+routes.put('/perguntas/:id_pergunta', async (req, res)=>{
     try{
         const {id_pergunta, newEnunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta} = req.body
 
