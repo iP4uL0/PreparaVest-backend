@@ -91,12 +91,12 @@ routes.post('/perguntas', async (req, res)=>{
         const {enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta} = req.body;
 
         if (
-            !enunciado || enunciado.trim() === "" ||
-            !alternativa_a || alternativa_a.trim() === "" ||
-            !alternativa_b || alternativa_b.trim() === "" ||
-            !alternativa_c || alternativa_c.trim() === "" ||
-            !alternativa_d || alternativa_d.trim() === "" ||
-            !correta || correta.trim() === ""
+            !enunciado || enunciado === "" ||
+            !alternativa_a || alternativa_a === "" ||
+            !alternativa_b || alternativa_b === "" ||
+            !alternativa_c || alternativa_c === "" ||
+            !alternativa_d || alternativa_d === "" ||
+            !correta || correta === ""
         ) {
             return res.status(400).json('Todos os campos são obrigatórios')
         }
@@ -154,12 +154,12 @@ routes.put('/editar', async (req, res)=>{
         const {id_pergunta, newEnunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta} = req.body
 
         if (
-            !newEnunciado || newEnunciado.trim() === "" ||
-            !alternativa_a || alternativa_a.trim() === "" ||
-            !alternativa_b || alternativa_b.trim() === "" ||
-            !alternativa_c || alternativa_c.trim() === "" ||
-            !alternativa_d || alternativa_d.trim() === "" ||
-            !correta || correta.trim() === ""
+            !newEnunciado || newEnunciado === "" ||
+            !alternativa_a || alternativa_a === "" ||
+            !alternativa_b || alternativa_b === "" ||
+            !alternativa_c || alternativa_c === "" ||
+            !alternativa_d || alternativa_d === "" ||
+            !correta || correta === ""
         ) {
             return res.status(400).json('Todos os campos são obrigatórios')
         }
