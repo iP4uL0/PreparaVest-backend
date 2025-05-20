@@ -150,9 +150,10 @@ routes.delete('/perguntas/:id_pergunta', async (req, res)=>{
 
 
 //*Editar perguntas
-routes.put('/perguntas/:id_pergunta', async (req, res)=>{
-    try{
-        const {id_pergunta, newEnunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta} = req.body
+routes.put('/perguntas/:id_pergunta', async (req, res) => {
+    try {
+        const { id_pergunta } = req.params;
+        const { newEnunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta } = req.body;
 
         if (
             !newEnunciado || newEnunciado === "" ||
@@ -162,28 +163,41 @@ routes.put('/perguntas/:id_pergunta', async (req, res)=>{
             !alternativa_d || alternativa_d === "" ||
             !correta || correta === ""
         ) {
-            return res.status(400).json('Todos os campos são obrigatórios')
+            return res.status(400).json('Todos os campos são obrigatórios');
         }
 
-        await sql`update perguntas set enunciado = ${newEnunciado}, 
-        alternativa_a = ${alternativa_a}, 
-        alternativa_b = ${alternativa_b}, 
-        alternativa_c = ${alternativa_c}, 
-        alternativa_d = ${alternativa_d},  
-        correta = ${correta}
-        where id_pergunta = ${id_pergunta};`
-  
-        return res.status(204).json('Ação efetuada')
-    }
-    catch(error){
-        if(error.code === '23502' || error.code === '23505'){
-            return res.status(409).json('Violação de regra do bd')
+        //Validação do ENUM
+        const opcoesValidas = ['alternativa_a', 'alternativa_b', 'alternativa_c', 'alternativa_d'];
+        if (!opcoesValidas.includes(correta)) {
+            return res.status(409).json('Valor inválido para o campo "correta". Use apenas alternativa_a, alternativa_b, alternativa_c ou alternativa_d.');
         }
-        else{
-            return res.status(500).json('Erro inesperado')
+
+        //Verificar se o enunciado já existe em outra pergunta
+        const existente = await sql`
+            SELECT id_pergunta FROM perguntas 
+            WHERE enunciado = ${newEnunciado} 
+            AND id_pergunta <> ${id_pergunta}
+        `;
+        if (existente.length > 0) {
+            return res.status(409).json('Já existe uma pergunta com esse enunciado.');
         }
+
+        await sql`
+            UPDATE perguntas 
+            SET enunciado = ${newEnunciado}, 
+                alternativa_a = ${alternativa_a}, 
+                alternativa_b = ${alternativa_b}, 
+                alternativa_c = ${alternativa_c}, 
+                alternativa_d = ${alternativa_d},  
+                correta = ${correta}
+            WHERE id_pergunta = ${id_pergunta};
+        `;
+
+        return res.status(204).json('Ação efetuada');
+    } catch (error) {
+        return res.status(500).json('Erro inesperado');
     }
-})
+});
 
 
 export default routes
