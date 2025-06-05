@@ -37,7 +37,7 @@ routes.post('/usuario', async (req, res) => {
         const {email, senha} = req.body;
 
         if (!email || email.trim() === "" || !senha || senha.trim() === "") {
-            return res.status(400).json('Email e senha são obrigatórios')
+            return res.status(400).json({ mensagem : 'Email e senha são obrigatórios'})
         }
 
         const hash = await Criarhash(senha, 10)
@@ -50,10 +50,10 @@ routes.post('/usuario', async (req, res) => {
         return res.status(201).json({ mensagem: "Usuário criado com sucesso" });
     } catch (error) {
         if(error.code === '23502' || error.code === '23505'){
-            return res.status(409).json('Violation rule')
+            return res.status(409).json({mensagem: 'Violation rule'})
         }
         else{
-            return res.status(500).json('Erro inesperado')
+            return res.status(500).json({mensagem: 'Erro inesperado'})
         }
     }
 })
@@ -127,6 +127,17 @@ routes.post('/perguntas', async (req, res)=>{
 routes.get('/perguntas',async (req, res)=>{
     try{
         const consulta = await sql`SELECT * FROM perguntas WHERE status = '1' ORDER BY RANDOM() LIMIT 10`
+        return res.status(201).json(consulta)
+    }
+    catch(error){
+        return res.status(500).json('Ocorreu um erro inesperado')
+    }
+});
+
+//*Busca perguntas cards
+routes.get('/perguntas/cards',async (req, res)=>{
+    try{
+        const consulta = await sql`SELECT * FROM perguntas WHERE status = '1'`
         return res.status(201).json(consulta)
     }
     catch(error){
