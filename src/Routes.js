@@ -8,7 +8,7 @@ const routes = express.Router()
 routes.post('/login',async (req, res)=>{
     const { email, senha } = req.body
     try{
-        const consulta = await sql`select id_usuario,senha, funcao from usuarios
+        const consulta = await sql`select id_user,senha, funcao from usuarios
         where email = ${email} AND status = '1'`
 
         if(consulta.length == 0){
@@ -44,7 +44,7 @@ routes.post('/usuario', async (req, res) => {
 
         await sql`
             INSERT INTO usuarios(email, senha, funcao, status)
-            VALUES (${email}, ${hash}, 'aluno', '1' )
+            VALUES (${email}, ${hash}, '1', '1' )
         `;
 
         return res.status(201).json({ mensagem: "Usuário criado com sucesso" });
@@ -71,7 +71,7 @@ routes.post('/usuario/admin', async (req, res)=>{
         const hash = await Criarhash(senha, 10)
         
         await sql`insert into usuarios(email, senha, funcao, status)
-        values(${email}, ${hash}, 'professor', '1')`
+        values(${email}, ${hash}, '2', '1')`
 
         return res.status(201).json('ok')
 
@@ -89,25 +89,27 @@ routes.post('/usuario/admin', async (req, res)=>{
 //*cadastro perguntas
 routes.post('/perguntas', async (req, res)=>{
     try{
-        const {enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta} = req.body;
+        const {enunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta} = req.body;
 
         if (
             !enunciado || enunciado === "" ||
-            !alternativa_a || alternativa_a === "" ||
-            !alternativa_b || alternativa_b === "" ||
-            !alternativa_c || alternativa_c === "" ||
-            !alternativa_d || alternativa_d === "" ||
+            !alt_a || alt_a === "" ||
+            !alt_b || alt_b === "" ||
+            !alt_c || alt_c === "" ||
+            !alt_d || alt_d === "" ||
+            !alt_e || alt_e === "" ||
             !correta || correta === ""
         ) {
             return res.status(400).json('Todos os campos são obrigatórios')
         }
 
-        await sql`insert into perguntas (enunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta, status) values (
+        await sql`insert into perguntas (enunciado, alt_a, alt_b, alt_c, alt_d, alt_e correta, status) values (
         ${enunciado}, 
-        ${alternativa_a}, 
-        ${alternativa_b}, 
-        ${alternativa_c}, 
-        ${alternativa_d}, 
+        ${alt_a}, 
+        ${alt_b}, 
+        ${alt_c}, 
+        ${alt_d}, 
+        ${alt_e}, 
         ${correta}, 
         '1');`
         return res.status(201).json('ok')
@@ -165,23 +167,24 @@ routes.delete('/perguntas/:id_pergunta', async (req, res)=>{
 routes.put('/perguntas/:id_pergunta', async (req, res) => {
     try {
         const { id_pergunta } = req.params;
-        const { newEnunciado, alternativa_a, alternativa_b, alternativa_c, alternativa_d, correta } = req.body;
+        const { newEnunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta } = req.body;
 
         if (
             !newEnunciado || newEnunciado === "" ||
-            !alternativa_a || alternativa_a === "" ||
-            !alternativa_b || alternativa_b === "" ||
-            !alternativa_c || alternativa_c === "" ||
-            !alternativa_d || alternativa_d === "" ||
+            !alt_a || alt_a === "" ||
+            !alt_b || alt_b === "" ||
+            !alt_c || alt_c === "" ||
+            !alt_d || alt_d === "" ||
+            !alt_e || alt_e === "" ||
             !correta || correta === ""
         ) {
             return res.status(400).json('Todos os campos são obrigatórios');
         }
 
         //Validação do ENUM
-        const opcoesValidas = ['alternativa_a', 'alternativa_b', 'alternativa_c', 'alternativa_d'];
+        const opcoesValidas = ['alt_a', 'alt_b', 'alt_c', 'alt_d', 'alt_e'];
         if (!opcoesValidas.includes(correta)) {
-            return res.status(409).json('Valor inválido para o campo "correta". Use apenas alternativa_a, alternativa_b, alternativa_c ou alternativa_d.');
+            return res.status(409).json('Valor inválido para o campo "correta". Use apenas alt_a, alt_b, alt_c, alt_d ou alt_e');
         }
 
         //Verificar se o enunciado já existe em outra pergunta
@@ -197,10 +200,11 @@ routes.put('/perguntas/:id_pergunta', async (req, res) => {
         await sql`
             UPDATE perguntas 
             SET enunciado = ${newEnunciado}, 
-                alternativa_a = ${alternativa_a}, 
-                alternativa_b = ${alternativa_b}, 
-                alternativa_c = ${alternativa_c}, 
-                alternativa_d = ${alternativa_d},  
+                alt_a = ${alt_a}, 
+                alt_b = ${alt_b}, 
+                alt_c = ${alt_c}, 
+                alt_d = ${alt_d}, 
+                alt_e = ${alt_e}, 
                 correta = ${correta}
             WHERE id_pergunta = ${id_pergunta};
         `;
