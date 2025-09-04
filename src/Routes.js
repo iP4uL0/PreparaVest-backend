@@ -147,6 +147,21 @@ routes.get('/perguntas/cards',async (req, res)=>{
     }
 });
 
+//*busca acertos e erros
+routes.post('/acertos',async (req, res)=>{
+    const { id_user } = req.body
+    try{
+        const consulta = await sql`SELECT * FROM get_acertos(${id_user})`
+        return res.status(201).json(consulta)
+    }
+    catch(error){
+        return res.status(500).json('Ocorreu um erro inesperado')
+    }
+})
+
+
+
+
 
 //*Deletar pergunta
 // const {id_pergunta} = req.params
