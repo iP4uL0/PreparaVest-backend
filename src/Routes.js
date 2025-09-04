@@ -89,7 +89,7 @@ routes.post('/usuario/admin', async (req, res)=>{
 //*cadastro perguntas
 routes.post('/perguntas', async (req, res)=>{
     try{
-        const {enunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta} = req.body;
+        const {enunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta, imagem} = req.body;
 
         if (
             !enunciado || enunciado === "" ||
@@ -103,15 +103,8 @@ routes.post('/perguntas', async (req, res)=>{
             return res.status(400).json('Todos os campos são obrigatórios')
         }
 
-        await sql`insert into perguntas (enunciado, alt_a, alt_b, alt_c, alt_d, alt_e correta, status) values (
-        ${enunciado}, 
-        ${alt_a}, 
-        ${alt_b}, 
-        ${alt_c}, 
-        ${alt_d}, 
-        ${alt_e}, 
-        ${correta}, 
-        '1');`
+
+        await sql`insert into public.perguntas (enunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta, imagem) values (${enunciado}, ${alt_a}, ${alt_b}, ${alt_c}, ${alt_d}, ${alt_e}, ${correta}, ${imagem});`
         return res.status(201).json('ok')
     }
     catch(error){
@@ -120,6 +113,7 @@ routes.post('/perguntas', async (req, res)=>{
         }
         else{
             return res.status(500).json('Erro inesperado')
+            
         }
     }
 })
