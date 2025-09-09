@@ -7,20 +7,26 @@ const routes = express.Router()
 //*busca de usuarios 
 routes.post('/login',async (req, res)=>{
     const { email, senha } = req.body
-    try{
-        const hash = await Criarhash(senha, 10)
-        const consulta = await sql`select id_user,senha, funcao from usuarios
-        where email = ${email} and senha = ${hash} AND status = '1'`
+    try {
+        
+        const consulta = await sql`
+            SELECT id_user, nome, status, funcao, senha
+            FROM usuarios
+            WHERE email = ${email} AND status = '1'
+        `;
 
-        if(consulta.length == 0){
+        if (consulta.length == 0) {
             return res.status(401).json('usuario não cadastrado')
         }
 
-        
-
-        if(teste){
-            return res.status(200).json(consulta[0].funcao)
-            
+        const usuario = consulta[0]
+        const teste = await compararHash(senha, usuario.senha);
+        if (teste) {
+            return res.status(200).json({
+                id_user: usuario.id_user,
+                nome: usuario.nome,
+                status: usuario.status
+            });
         }
         else{
             return res.status(401).json('usuario ou senha incorretos')
@@ -32,7 +38,7 @@ routes.post('/login',async (req, res)=>{
 })
 
 
-//*cadastro de alunos
+//*cadastro de alunos 
 routes.post('/usuario', async (req, res) => {
     try {
         const {email, senha, nome} = req.body;
@@ -63,16 +69,16 @@ routes.post('/usuario', async (req, res) => {
 //*cadastro de Adiministradores
 routes.post('/usuario/admin', async (req, res)=>{
     try {
-        const {email, senha} = req.body;
+        const {email, senha, nome} = req.body;
 
-        if (!email || email.trim() === "" || !senha || senha.trim() === "") {
+        if (!email || email.trim() === "" || !senha || senha.trim() === ""|| !nome || nome.trim() === "") {
             return res.status(400).json('Email e senha são obrigatórios')
         }
 
         const hash = await Criarhash(senha, 10)
         
-        await sql`insert into usuarios(email, senha, funcao, status)
-        values(${email}, ${hash}, '2', '1')`
+        await sql`insert into usuarios(email, senha, funcao, status, nome)
+        values(${email}, ${hash}, '2', '1', ${nome})`
 
         return res.status(201).json('ok')
 
@@ -143,7 +149,7 @@ routes.get('/perguntas/cards',async (req, res)=>{
 });
 
 //*busca acertos e erros
-routes.post('/acertos',async (req, res)=>{
+routes.get('/acertos',async (req, res)=>{
     const { id_user } = req.body
     try{
         const consulta = await sql`SELECT * FROM get_acertos(${id_user})`
@@ -155,7 +161,16 @@ routes.post('/acertos',async (req, res)=>{
 })
 
 //*correção
-
+routes.post('/perguntas/correcao',async (req, res)=>{
+    try{
+        const{id_user, id_quest, resposta} = req.body
+        await sql`SELECT correcao(${id_user}, ${id_quest}, ${resposta});`
+        return res.status(201).json('ok')
+    }
+    catch(error){
+        return res.status(500).json('erro')
+    }
+})
 
 
 
