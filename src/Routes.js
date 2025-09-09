@@ -8,14 +8,15 @@ const routes = express.Router()
 routes.post('/login',async (req, res)=>{
     const { email, senha } = req.body
     try{
+        const hash = await Criarhash(senha, 10)
         const consulta = await sql`select id_user,senha, funcao from usuarios
-        where email = ${email} AND status = '1'`
+        where email = ${email} and senha = ${hash} AND status = '1'`
 
         if(consulta.length == 0){
             return res.status(401).json('usuario não cadastrado')
         }
 
-        const teste = await compararHash(senha, consulta[0].senha)
+        
 
         if(teste){
             return res.status(200).json(consulta[0].funcao)
@@ -34,17 +35,17 @@ routes.post('/login',async (req, res)=>{
 //*cadastro de alunos
 routes.post('/usuario', async (req, res) => {
     try {
-        const {email, senha} = req.body;
+        const {email, senha, nome} = req.body;
 
-        if (!email || email.trim() === "" || !senha || senha.trim() === "") {
+        if (!email || email.trim() === "" || !senha || senha.trim() === "" || !nome || nome.trim() === "") {
             return res.status(400).json({ mensagem : 'Email e senha são obrigatórios'})
         }
 
         const hash = await Criarhash(senha, 10)
 
         await sql`
-            INSERT INTO usuarios(email, senha, funcao, status)
-            VALUES (${email}, ${hash}, '1', '1' )
+            INSERT INTO usuarios(email, senha, funcao, status, nome)
+            VALUES (${email}, ${hash}, '1', '1',${nome} )
         `;
 
         return res.status(201).json({ mensagem: "Usuário criado com sucesso" });
@@ -153,6 +154,9 @@ routes.post('/acertos',async (req, res)=>{
     }
 })
 
+//*correção
+
+
 
 
 
@@ -176,7 +180,7 @@ routes.delete('/perguntas/:id_pergunta', async (req, res)=>{
 routes.put('/perguntas/:id_pergunta', async (req, res) => {
     try {
         const { id_pergunta } = req.params;
-        const { newEnunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta } = req.body;
+        const { newEnunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta} = req.body;
 
         if (
             !newEnunciado || newEnunciado === "" ||
@@ -191,9 +195,9 @@ routes.put('/perguntas/:id_pergunta', async (req, res) => {
         }
 
         //Validação do ENUM
-        const opcoesValidas = ['alt_a', 'alt_b', 'alt_c', 'alt_d', 'alt_e'];
+        const opcoesValidas = ['a', 'b', 'c', 'd', 'e'];
         if (!opcoesValidas.includes(correta)) {
-            return res.status(409).json('Valor inválido para o campo "correta". Use apenas alt_a, alt_b, alt_c, alt_d ou alt_e');
+            return res.status(409).json('Valor inválido para o campo "correta". Use apenas a, b, c, d ou e');
         }
 
         //Verificar se o enunciado já existe em outra pergunta
