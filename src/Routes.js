@@ -25,7 +25,7 @@ routes.post('/login',async (req, res)=>{
             return res.status(200).json({
                 id_user: usuario.id_user,
                 nome: usuario.nome,
-                status: usuario.status
+                funcao: usuario.funcao
             });
         }
         else{
