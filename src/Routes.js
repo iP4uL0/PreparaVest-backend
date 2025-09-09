@@ -144,7 +144,7 @@ routes.get('/perguntas/cards',async (req, res)=>{
         return res.status(201).json(consulta)
     }
     catch(error){
-        return res.status(500).json(error, 'Ocorreu um erro inesperado')
+        return res.status(500).json('Ocorreu um erro inesperado')
     }
 });
 
