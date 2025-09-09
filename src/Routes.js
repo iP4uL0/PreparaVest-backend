@@ -170,16 +170,28 @@ routes.post('/perguntas/correcao', async (req, res) => {
             return res.status(400).json('Nenhuma resposta enviada');
         }
 
-        let pontuacao;
+        let pontuacao
+        let acertosTentativa = 0
+        // Processa cada resposta
         for (const item of respostas) {
             const { id_quest, resposta } = item;
-            const resultado = await sql`
-                SELECT * FROM correcao(${id_user}, ${id_quest}, ${resposta});`
+
+            // Chama a função correcao que já retorna a pontuação total
+            const resultado = await sql`SELECT * FROM correcao(${id_user}, ${id_quest}, ${resposta});`
             pontuacao = resultado[0];
+
+            // Contabiliza acerto da tentativa
+            if (resposta && resposta !== '') {
+                const corretaQuery = await sql`SELECT correta FROM perguntas WHERE id_quest = ${id_quest};`
+                if (corretaQuery[0].correta === resposta) {
+                    acertosTentativa += 1;
+                }
+            }
         }
 
         return res.status(201).json({
             mensagem: 'Respostas registradas com sucesso',
+            acertosTentativa,
             pontuacao
         });
 
