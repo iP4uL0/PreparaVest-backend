@@ -129,7 +129,7 @@ routes.post('/perguntas', async (req, res)=>{
 //*Busca perguntas
 routes.get('/perguntas',async (req, res)=>{
     try{
-        const consulta = await sql`SELECT * FROM perguntas WHERE status = '1' ORDER BY RANDOM() LIMIT 10`
+        const consulta = await sql`SELECT * FROM perguntas ORDER BY RANDOM() LIMIT 10`
         return res.status(201).json(consulta)
     }
     catch(error){
@@ -140,11 +140,11 @@ routes.get('/perguntas',async (req, res)=>{
 //*Busca perguntas cards
 routes.get('/perguntas/cards',async (req, res)=>{
     try{
-        const consulta = await sql`SELECT * FROM perguntas WHERE status = '1'`
+        const consulta = await sql`SELECT * FROM perguntas`
         return res.status(201).json(consulta)
     }
     catch(error){
-        return res.status(500).json('Ocorreu um erro inesperado')
+        return res.status(500).json(error, 'Ocorreu um erro inesperado')
     }
 });
 
