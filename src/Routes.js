@@ -150,9 +150,8 @@ routes.get('/perguntas/cards',async (req, res)=>{
 
 //*busca acertos e erros
 routes.get('/acertos',async (req, res)=>{
-    const { id_user } = req.body
     try{
-        const consulta = await sql`SELECT * FROM get_acertos(${id_user})`
+        const consulta = await sql`SELECT * FROM get_pontuacao();`
         return res.status(201).json(consulta)
     }
     catch(error){
@@ -160,20 +159,35 @@ routes.get('/acertos',async (req, res)=>{
     }
 })
 
+
+
 //*correção
-routes.post('/perguntas/correcao',async (req, res)=>{
-    try{
-        const{id_user, id_quest, resposta} = req.body
-        await sql`SELECT correcao(${id_user}, ${id_quest}, ${resposta});`
-        return res.status(201).json('ok')
-    }
-    catch(error){
-        return res.status(500).json('erro')
+routes.post('/perguntas/correcao', async (req, res) => {
+    try {
+        const { id_user, respostas } = req.body;
+
+        if (!Array.isArray(respostas) || respostas.length === 0) {
+            return res.status(400).json('Nenhuma resposta enviada');
+        }
+
+        let pontuacao;
+        for (const item of respostas) {
+            const { id_quest, resposta } = item;
+            const resultado = await sql`
+                SELECT * FROM correcao(${id_user}, ${id_quest}, ${resposta});`
+            pontuacao = resultado[0];
+        }
+
+        return res.status(201).json({
+            mensagem: 'Respostas registradas com sucesso',
+            pontuacao
+        });
+
+    } catch (error) {
+        console.error(error)
+        return res.status(500).json('Erro ao registrar respostas')
     }
 })
-
-
-
 
 
 //*Deletar pergunta
