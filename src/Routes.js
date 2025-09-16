@@ -43,9 +43,18 @@ routes.post('/usuario', async (req, res) => {
     try {
         const {email, senha, nome} = req.body;
 
+        
         if (!email || email.trim() === "" || !senha || senha.trim() === "" || !nome || nome.trim() === "") {
             return res.status(400).json({ mensagem : 'Email e senha são obrigatórios'})
         }
+
+        const consulta = await sql`SELECT id_user, nome, status, funcao, senha
+        FROM usuarios WHERE email = ${email} AND status = '1'`;
+
+        if(consulta.length > 0) {
+            return res.status(401).json({ mensagem: 'Usuário já cadastrado' });
+        }
+    
 
         const hash = await Criarhash(senha, 10)
 
@@ -73,6 +82,12 @@ routes.post('/usuario/admin', async (req, res)=>{
 
         if (!email || email.trim() === "" || !senha || senha.trim() === ""|| !nome || nome.trim() === "") {
             return res.status(400).json('Email e senha são obrigatórios')
+        }
+        const consulta = await sql`SELECT id_user, nome, status, funcao, senha
+        FROM usuarios WHERE email = ${email} AND status = '1'`;
+
+        if(consulta.length > 0) {
+            return res.status(401).json({ mensagem: 'Usuário já cadastrado' });
         }
 
         const hash = await Criarhash(senha, 10)
@@ -172,11 +187,10 @@ routes.post('/perguntas/correcao', async (req, res) => {
 
         let pontuacao
         let acertosTentativa = 0
-        // Processa cada resposta
+        
         for (const item of respostas) {
             const { id_quest, resposta } = item;
 
-            // Chama a função correcao que já retorna a pontuação total
             const resultado = await sql`SELECT * FROM correcao(${id_user}, ${id_quest}, ${resposta});`
             pontuacao = resultado[0];
 
