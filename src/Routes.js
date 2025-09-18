@@ -242,7 +242,7 @@ routes.delete('/perguntas/:id_pergunta', async (req, res) => {
 //*Editar perguntas
 routes.put('/perguntas/:id_pergunta', async (req, res) => {
     try {
-        const { id_quest } = req.params;
+        const { id_pergunta } = req.params;
         const { newEnunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta} = req.body;
 
         if (
@@ -265,10 +265,12 @@ routes.put('/perguntas/:id_pergunta', async (req, res) => {
 
         //Verificar se o enunciado já existe em outra pergunta
         const existente = await sql`
-            SELECT id_pergunta FROM perguntas 
+            SELECT id_quest FROM perguntas 
             WHERE enunciado = ${newEnunciado} 
-            AND id_pergunta <> ${id_pergunta}
+            AND id_quest <> ${id_pergunta}
         `;
+
+        console.log(existente)
         if (existente.length > 0) {
             return res.status(409).json('Já existe uma pergunta com esse enunciado.');
         }
@@ -282,11 +284,12 @@ routes.put('/perguntas/:id_pergunta', async (req, res) => {
                 alt_d = ${alt_d}, 
                 alt_e = ${alt_e}, 
                 correta = ${correta}
-            WHERE id_quest = ${id_quest};
+            WHERE id_quest = ${id_pergunta};
         `;
 
         return res.status(204).json('Ação efetuada');
     } catch (error) {
+        console.log(error)
         return res.status(500).json('Erro inesperado');
     }
 });
