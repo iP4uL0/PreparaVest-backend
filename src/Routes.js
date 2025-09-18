@@ -218,23 +218,31 @@ routes.post('/perguntas/correcao', async (req, res) => {
 
 //*Deletar pergunta
 // const {id_pergunta} = req.params
-routes.delete('/perguntas/:id_pergunta', async (req, res)=>{
-    try{
-        const {id_pergunta} = req.params
-      
-        await sql`DELETE FROM perguntas WHERE id_pergunta = ${id_pergunta};`
-        return res.status(204).json('Pergunta deletada')
+routes.delete('/perguntas/:id_pergunta', async (req, res) => {
+  try {
+    const { id_pergunta } = req.params;
+
+    const result = await sql`
+      DELETE FROM perguntas WHERE id_quest = ${id_pergunta};
+    `;
+
+    if (result.count === 0) {
+      return res.status(404).json('Pergunta não encontrada');
     }
-    catch(error){
-        return res.status(500).json('ocorreu um erro')
-    }
-})
+
+    return res.status(204).send(); // 204 = No Content
+  } catch (error) {
+    console.error('Erro ao deletar pergunta:', error);
+    return res.status(500).json('Ocorreu um erro');
+  }
+});
+
 
 
 //*Editar perguntas
 routes.put('/perguntas/:id_pergunta', async (req, res) => {
     try {
-        const { id_pergunta } = req.params;
+        const { id_quest } = req.params;
         const { newEnunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta} = req.body;
 
         if (
@@ -274,7 +282,7 @@ routes.put('/perguntas/:id_pergunta', async (req, res) => {
                 alt_d = ${alt_d}, 
                 alt_e = ${alt_e}, 
                 correta = ${correta}
-            WHERE id_pergunta = ${id_pergunta};
+            WHERE id_quest = ${id_quest};
         `;
 
         return res.status(204).json('Ação efetuada');
