@@ -9,11 +9,6 @@ app.use(express.urlencoded({extended: true}))
 app.use(cors())
 app.use(routes)
 
-
-
-
-
-
 app.listen(3000, ()=>{
     console.log('Api rodando')
 })

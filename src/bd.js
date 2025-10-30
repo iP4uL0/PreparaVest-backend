@@ -1,5 +1,5 @@
 import postgres from "postgres";
 
-const sql = postgres("postgres://root:root@192.168.1.15:5432/Projeto_Quizz");
+const sql = postgres("postgresql://postgres.bvroxsawzjdxbxcsslaf:wj2LAWUUbBULrFaG@aws-1-us-east-1.pooler.supabase.com:5432/postgres");
 
 export default sql;

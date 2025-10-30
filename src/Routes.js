@@ -270,7 +270,7 @@ routes.put('/perguntas/:id_pergunta', async (req, res) => {
             AND id_quest <> ${id_pergunta}
         `;
 
-        console.log(existente)
+        // console.log(existente)
         if (existente.length > 0) {
             return res.status(409).json('Já existe uma pergunta com esse enunciado.');
         }
