@@ -243,10 +243,10 @@ routes.delete('/perguntas/:id_pergunta', async (req, res) => {
 routes.put('/perguntas/:id_pergunta', async (req, res) => {
     try {
         const { id_pergunta } = req.params;
-        const { newEnunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta} = req.body;
+        const { enunciado, alt_a, alt_b, alt_c, alt_d, alt_e, correta} = req.body;
 
         if (
-            !newEnunciado || newEnunciado === "" ||
+            !enunciado || enunciado === "" ||
             !alt_a || alt_a === "" ||
             !alt_b || alt_b === "" ||
             !alt_c || alt_c === "" ||
@@ -266,7 +266,7 @@ routes.put('/perguntas/:id_pergunta', async (req, res) => {
         //Verificar se o enunciado já existe em outra pergunta
         const existente = await sql`
             SELECT id_quest FROM perguntas 
-            WHERE enunciado = ${newEnunciado} 
+            WHERE enunciado = ${enunciado} 
             AND id_quest <> ${id_pergunta}
         `;
 
@@ -277,7 +277,7 @@ routes.put('/perguntas/:id_pergunta', async (req, res) => {
 
         await sql`
             UPDATE perguntas 
-            SET enunciado = ${newEnunciado}, 
+            SET enunciado = ${enunciado}, 
                 alt_a = ${alt_a}, 
                 alt_b = ${alt_b}, 
                 alt_c = ${alt_c}, 
